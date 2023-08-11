@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/xopxe23/books-server/internal/domain"
 )
@@ -36,6 +39,36 @@ func (b *Books) GetById(id int) (domain.Book, error) {
 		return domain.Book{}, err
 	}
 	return book, nil
+}
+
+func (b *Books) Update(id int, input domain.UpdateBookInput) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+
+	if input.Title != nil {
+		setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
+		args = append(args, *input.Title)
+		argId++
+	}
+
+	if input.Author != nil {
+		setValues = append(setValues, fmt.Sprintf("author=$%d", argId))
+		args = append(args, *input.Author)
+		argId++
+	}
+
+	if input.Rating != nil {
+		setValues = append(setValues, fmt.Sprintf("rating=$%d", argId))
+		args = append(args, *input.Rating)
+		argId++
+	}
+	setQuery := strings.Join(setValues, ", ")
+	query := fmt.Sprintf("UPDATE books SET %s WHERE id = $%d", setQuery, argId)
+	args = append(args, id)
+
+	_, err := b.db.Exec(query, args...)
+	return err
 }
 
 func (b *Books) Delete(id int) error {

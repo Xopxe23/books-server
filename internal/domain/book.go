@@ -6,3 +6,9 @@ type Book struct {
 	Author string `json:"author"`
 	Rating int    `json:"rating"`
 }
+
+type UpdateBookInput struct {
+	Title  *string `json:"title"`
+	Author *string `json:"author"`
+	Rating *int    `json:"rating"`
+}

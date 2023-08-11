@@ -12,6 +12,7 @@ type Books interface {
 	Create(book domain.Book) (int, error)
 	GetAll() ([]domain.Book, error)
 	GetById(id int) (domain.Book, error)
+	Update(id int, input domain.UpdateBookInput) error
 	Delete(id int) error
 }
 
@@ -78,7 +79,26 @@ func (h Handler) getBookById(c *gin.Context) {
 	c.JSON(http.StatusOK, book)
 }
 
-func (h Handler) updateBook(c *gin.Context) {}
+func (h Handler) updateBook(c *gin.Context) {
+	var input domain.UpdateBookInput
+	if err := c.Bind(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err = h.bookService.Update(id, input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, map[string]string{
+		"status": "ok",
+	})
+}
 
 func (h Handler) deleteBook(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))

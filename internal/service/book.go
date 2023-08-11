@@ -6,6 +6,7 @@ type BooksRepository interface {
 	Create(book domain.Book) (int, error)
 	GetAll() ([]domain.Book, error)
 	GetById(id int) (domain.Book, error)
+	Update(id int, input domain.UpdateBookInput) error
 	Delete(id int) error
 }
 
@@ -29,6 +30,10 @@ func (b *Books) GetAll() ([]domain.Book, error) {
 
 func (b *Books) GetById(id int) (domain.Book, error) {
 	return b.repo.GetById(id)
+}
+
+func (b *Books) Update(id int, input domain.UpdateBookInput) error {
+	return b.repo.Update(id, input)
 }
 
 func (b *Books) Delete(id int) error {
