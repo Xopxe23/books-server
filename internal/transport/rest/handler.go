@@ -5,6 +5,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
+	_ "github.com/xopxe23/books-server/docs"
 	"github.com/xopxe23/books-server/internal/domain"
 )
 
@@ -26,6 +29,7 @@ func NewHandler(books Books) *Handler {
 
 func (h Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+	router.GET("/swag/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	books := router.Group("/books")
 	{
 		books.POST("/", h.createBook)
@@ -37,6 +41,15 @@ func (h Handler) InitRoutes() *gin.Engine {
 	return router
 }
 
+// @Summary Create Book
+// @Tags Books REST
+// @ID create-book
+// @Accept json
+// @Produce json
+// @Param input body domain.Book true "book info"
+// @Success 200 {integer} integer
+// @Failure default {object} errorResponse
+// @Router /books/ [post]
 func (h Handler) createBook(c *gin.Context) {
 	var book domain.Book
 	if err := c.Bind(&book); err != nil {
@@ -53,6 +66,14 @@ func (h Handler) createBook(c *gin.Context) {
 	})
 }
 
+// @Summary Get All Books
+// @Tags Books REST
+// @ID get-all-books
+// @Accept json
+// @Produce json
+// @Success 200 {integer} []domain.Book
+// @Failure default {object} errorResponse
+// @Router /books/ [get]
 func (h Handler) getAllBooks(c *gin.Context) {
 	books, err := h.bookService.GetAll()
 	if err != nil {
@@ -64,6 +85,15 @@ func (h Handler) getAllBooks(c *gin.Context) {
 	})
 }
 
+// @Summary Get Book by ID
+// @Tags Books REST
+// @ID get-book-by-id
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {integer} domain.Book
+// @Failure default {object} errorResponse
+// @Router /books/{id} [get]
 func (h Handler) getBookById(c *gin.Context) {
 	var book domain.Book
 	id, err := strconv.Atoi(c.Param("id"))
@@ -79,6 +109,16 @@ func (h Handler) getBookById(c *gin.Context) {
 	c.JSON(http.StatusOK, book)
 }
 
+// @Summary Update Book
+// @Tags Books REST
+// @ID update-book
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Param input body domain.UpdateBookInput true "Update input"
+// @Success 200 {integer} string
+// @Failure default {object} errorResponse
+// @Router /books/{id} [put]
 func (h Handler) updateBook(c *gin.Context) {
 	var input domain.UpdateBookInput
 	if err := c.Bind(&input); err != nil {
@@ -100,6 +140,15 @@ func (h Handler) updateBook(c *gin.Context) {
 	})
 }
 
+// @Summary Delete Book
+// @Tags Books REST
+// @ID delete-book
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {integer} string
+// @Failure default {object} errorResponse
+// @Router /books/{id} [delete]
 func (h Handler) deleteBook(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

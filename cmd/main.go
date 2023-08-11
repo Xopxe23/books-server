@@ -14,6 +14,13 @@ import (
 	"github.com/xopxe23/books-server/pkg/database"
 )
 
+// @title Books App API
+// @version 1.0
+// @description API Server for Books Application
+
+// @host localhost:8000
+// @BasePath /
+
 func main() {
 	if err := godotenv.Load(); err != nil {
 		logrus.Fatalf("error loading env variables: %s", err.Error())
