@@ -21,3 +21,11 @@ func (b *Books) Create(book domain.Book) (int, error) {
 	}
 	return id, nil
 }
+
+func (b *Books) GetAll() ([]domain.Book, error) {
+	var books []domain.Book
+	if err := b.db.Select(&books, "SELECT * FROM books"); err != nil {
+		return nil, err
+	}
+	return books, nil
+}

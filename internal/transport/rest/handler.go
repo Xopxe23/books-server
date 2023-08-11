@@ -9,6 +9,7 @@ import (
 
 type Books interface {
 	Create(book domain.Book) (int, error)
+	GetAll() ([]domain.Book, error)
 }
 
 type Handler struct {
@@ -48,7 +49,17 @@ func (h Handler) createBook(c *gin.Context) {
 	})
 }
 
-func (h Handler) getAllBooks(c *gin.Context) {}
+func (h Handler) getAllBooks(c *gin.Context) {
+	books, err := h.bookService.GetAll()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"data": books,
+	})
+}
+
 func (h Handler) getBookById(c *gin.Context) {}
 func (h Handler) updateBook(c *gin.Context)  {}
 func (h Handler) deleteBook(c *gin.Context)  {}
