@@ -5,6 +5,7 @@ import "github.com/xopxe23/books-server/internal/domain"
 type BooksRepository interface {
 	Create(book domain.Book) (int, error)
 	GetAll() ([]domain.Book, error)
+	GetById(id int) (domain.Book, error)
 }
 
 type Books struct {
@@ -23,4 +24,8 @@ func (b *Books) Create(book domain.Book) (int, error) {
 
 func (b *Books) GetAll() ([]domain.Book, error) {
 	return b.repo.GetAll()
+}
+
+func (b *Books) GetById(id int) (domain.Book, error) {
+	return b.repo.GetById(id)
 }

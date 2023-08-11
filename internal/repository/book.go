@@ -29,3 +29,11 @@ func (b *Books) GetAll() ([]domain.Book, error) {
 	}
 	return books, nil
 }
+
+func (b *Books) GetById(id int) (domain.Book, error) {
+	var book domain.Book
+	if err := b.db.Get(&book, "SELECT * FROM books WHERE id = $1", id); err != nil {
+		return domain.Book{}, err
+	}
+	return book, nil
+}

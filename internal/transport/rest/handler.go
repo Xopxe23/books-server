@@ -2,6 +2,7 @@ package rest
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xopxe23/books-server/internal/domain"
@@ -10,6 +11,7 @@ import (
 type Books interface {
 	Create(book domain.Book) (int, error)
 	GetAll() ([]domain.Book, error)
+	GetById(id int) (domain.Book, error)
 }
 
 type Handler struct {
@@ -60,6 +62,20 @@ func (h Handler) getAllBooks(c *gin.Context) {
 	})
 }
 
-func (h Handler) getBookById(c *gin.Context) {}
-func (h Handler) updateBook(c *gin.Context)  {}
-func (h Handler) deleteBook(c *gin.Context)  {}
+func (h Handler) getBookById(c *gin.Context) {
+	var book domain.Book
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	book, err = h.bookService.GetById(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, book)
+}
+
+func (h Handler) updateBook(c *gin.Context) {}
+func (h Handler) deleteBook(c *gin.Context) {}
