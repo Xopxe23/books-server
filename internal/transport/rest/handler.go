@@ -12,6 +12,7 @@ type Books interface {
 	Create(book domain.Book) (int, error)
 	GetAll() ([]domain.Book, error)
 	GetById(id int) (domain.Book, error)
+	Delete(id int) error
 }
 
 type Handler struct {
@@ -78,4 +79,17 @@ func (h Handler) getBookById(c *gin.Context) {
 }
 
 func (h Handler) updateBook(c *gin.Context) {}
-func (h Handler) deleteBook(c *gin.Context) {}
+
+func (h Handler) deleteBook(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err = h.bookService.Delete(id); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+	}
+	c.JSON(http.StatusOK, map[string]string{
+		"status": "ok",
+	})
+}

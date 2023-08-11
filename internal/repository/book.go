@@ -37,3 +37,8 @@ func (b *Books) GetById(id int) (domain.Book, error) {
 	}
 	return book, nil
 }
+
+func (b *Books) Delete(id int) error {
+	_, err := b.db.Exec("DELETE FROM books WHERE id = $1", id)
+	return err
+}

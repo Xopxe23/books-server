@@ -6,6 +6,7 @@ type BooksRepository interface {
 	Create(book domain.Book) (int, error)
 	GetAll() ([]domain.Book, error)
 	GetById(id int) (domain.Book, error)
+	Delete(id int) error
 }
 
 type Books struct {
@@ -28,4 +29,8 @@ func (b *Books) GetAll() ([]domain.Book, error) {
 
 func (b *Books) GetById(id int) (domain.Book, error) {
 	return b.repo.GetById(id)
+}
+
+func (b *Books) Delete(id int) error {
+	return b.repo.Delete(id)
 }
