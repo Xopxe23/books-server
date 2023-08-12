@@ -11,6 +11,29 @@ definitions:
       title:
         type: string
     type: object
+  domain.SignInInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  domain.SignUpInput:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
   domain.UpdateBookInput:
     properties:
       author:
@@ -18,17 +41,6 @@ definitions:
       rating:
         type: integer
       title:
-        type: string
-    type: object
-  domain.User:
-    properties:
-      email:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      password:
         type: string
     type: object
   rest.errorResponse:
@@ -43,18 +55,18 @@ info:
   title: Books App API
   version: "1.0"
 paths:
-  /auth/sign-up:
+  /auth/sign-in:
     post:
       consumes:
       - application/json
-      operationId: create-user
+      operationId: sign-in
       parameters:
-      - description: Update input
+      - description: Sign In Input
         in: body
         name: input
         required: true
         schema:
-          $ref: '#/definitions/domain.User'
+          $ref: '#/definitions/domain.SignInInput'
       produces:
       - application/json
       responses:
@@ -66,7 +78,33 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/rest.errorResponse'
-      summary: Create User
+      summary: Sign In
+      tags:
+      - Users AUTH
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      operationId: sign-up
+      parameters:
+      - description: Sign Up Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SignUpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/rest.errorResponse'
+      summary: Sign Up
       tags:
       - Users AUTH
   /books/:
@@ -85,6 +123,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/rest.errorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Get All Books
       tags:
       - Books REST
@@ -192,4 +232,9 @@ paths:
       summary: Update Book
       tags:
       - Books REST
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

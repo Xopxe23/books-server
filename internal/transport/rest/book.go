@@ -34,6 +34,7 @@ func (h Handler) createBook(c *gin.Context) {
 }
 
 // @Summary Get All Books
+// @Security ApiKeyAuth
 // @Tags Books REST
 // @ID get-all-books
 // @Accept json

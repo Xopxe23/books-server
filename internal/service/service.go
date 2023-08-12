@@ -14,7 +14,9 @@ type Books interface {
 }
 
 type Auth interface {
-	CreateUser(input domain.User) (int, error)
+	CreateUser(input domain.SignUpInput) (int, error)
+	GenerateToken(input domain.SignInInput) (string, error)
+	ParseToken(token string) (int64, error)
 }
 
 type Service struct {

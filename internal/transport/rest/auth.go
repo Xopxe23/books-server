@@ -7,17 +7,17 @@ import (
 	"github.com/xopxe23/books-server/internal/domain"
 )
 
-// @Summary Create User
+// @Summary Sign Up
 // @Tags Users AUTH
-// @ID create-user
+// @ID sign-up
 // @Accept json
 // @Produce json
-// @Param input body domain.User true "Update input"
+// @Param input body domain.SignUpInput true "Sign Up Input"
 // @Success 200 {integer} int
 // @Failure default {object} errorResponse
 // @Router /auth/sign-up [post]
 func (h Handler) signUp(c *gin.Context) {
-	var input domain.User
+	var input domain.SignUpInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -33,4 +33,25 @@ func (h Handler) signUp(c *gin.Context) {
 	})
 }
 
-func (h Handler) signIn(c *gin.Context) {}
+// @Summary Sign In
+// @Tags Users AUTH
+// @ID sign-in
+// @Accept json
+// @Produce json
+// @Param input body domain.SignInInput true "Sign In Input"
+// @Success 200 {integer} string
+// @Failure default {object} errorResponse
+// @Router /auth/sign-in [post]
+func (h Handler) signIn(c *gin.Context) {
+	var input domain.SignInInput
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	token, err := h.services.Auth.GenerateToken(input)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, token)
+}
