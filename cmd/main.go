@@ -36,8 +36,8 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("error creating postgres connection: %s", err.Error())
 	}
-	repo := repository.NewBooks(db)
-	service := service.NewBooks(repo)
+	repo := repository.NewRepostory(db)
+	service := service.NewService(repo)
 	handler := rest.NewHandler(service)
 
 	srv := http.Server{
