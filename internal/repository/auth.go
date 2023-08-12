@@ -13,6 +13,12 @@ func NewAuthRepos(db *sqlx.DB) *AuthPostgres {
 	return &AuthPostgres{db: db}
 }
 
-func (a *AuthPostgres) SignUp(input domain.User) (int, error) {
-	return 0, nil
+func (p *AuthPostgres) CreateUser(input domain.User) (int, error) {
+	var id int
+	row := p.db.QueryRow("INSERT INTO users(name, email, password_hash) VALUES ($1, $2, $3) RETURNING id",
+		input.Name, input.Email, input.Password)
+	if err := row.Scan(&id); err != nil {
+		return 0, err
+	}
+	return id, nil
 }

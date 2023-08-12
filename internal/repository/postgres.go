@@ -14,7 +14,7 @@ type BooksRepository interface {
 }
 
 type UsersRepository interface {
-	SignUp(input domain.User) (int, error)
+	CreateUser(input domain.User) (int, error)
 }
 
 type Repository struct {

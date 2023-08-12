@@ -20,6 +20,17 @@ definitions:
       title:
         type: string
     type: object
+  domain.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+    type: object
   rest.errorResponse:
     properties:
       message:
@@ -32,6 +43,32 @@ info:
   title: Books App API
   version: "1.0"
 paths:
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      operationId: create-user
+      parameters:
+      - description: Update input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/rest.errorResponse'
+      summary: Create User
+      tags:
+      - Users AUTH
   /books/:
     get:
       consumes:
