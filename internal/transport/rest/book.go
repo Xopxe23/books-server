@@ -9,6 +9,7 @@ import (
 )
 
 // @Summary Create Book
+// @Security ApiKeyAuth
 // @Tags Books REST
 // @ID create-book
 // @Accept json
@@ -54,6 +55,7 @@ func (h Handler) getAllBooks(c *gin.Context) {
 }
 
 // @Summary Get Book by ID
+// @Security ApiKeyAuth
 // @Tags Books REST
 // @ID get-book-by-id
 // @Accept json
@@ -78,6 +80,7 @@ func (h Handler) getBookById(c *gin.Context) {
 }
 
 // @Summary Update Book
+// @Security ApiKeyAuth
 // @Tags Books REST
 // @ID update-book
 // @Accept json
@@ -109,6 +112,7 @@ func (h Handler) updateBook(c *gin.Context) {
 }
 
 // @Summary Delete Book
+// @Security ApiKeyAuth
 // @Tags Books REST
 // @ID delete-book
 // @Accept json

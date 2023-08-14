@@ -14,9 +14,10 @@ type Books interface {
 }
 
 type Auth interface {
-	CreateUser(input domain.SignUpInput) (int, error)
-	GenerateToken(input domain.SignInInput) (string, error)
+	SignUp(input domain.SignUpInput) (int, error)
+	SignIn(input domain.SignInInput) (string, string, error)
 	ParseToken(token string) (int64, error)
+	RefreshTokens(refreshToken string) (string, string, error)
 }
 
 type Service struct {
@@ -27,6 +28,6 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Books: NewBooksService(repos.BooksRepository),
-		Auth: NewAuthService(repos.UsersRepository),
+		Auth:  NewAuthService(repos.UsersRepository),
 	}
 }

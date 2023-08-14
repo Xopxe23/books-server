@@ -16,6 +16,8 @@ type BooksRepository interface {
 type UsersRepository interface {
 	CreateUser(input domain.SignUpInput) (int, error)
 	GetUser(input domain.SignInInput) (domain.User, error)
+	CreateToken(token domain.RefreshSession) error
+	GetToken(token string) (domain.RefreshSession, error)
 }
 
 type Repository struct {

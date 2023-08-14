@@ -150,6 +150,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/rest.errorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Create Book
       tags:
       - Books REST
@@ -175,6 +177,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/rest.errorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Delete Book
       tags:
       - Books REST
@@ -199,6 +203,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/rest.errorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Get Book by ID
       tags:
       - Books REST
@@ -229,6 +235,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/rest.errorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Update Book
       tags:
       - Books REST

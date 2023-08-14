@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,19 +17,19 @@ import (
 // @Success 200 {integer} int
 // @Failure default {object} errorResponse
 // @Router /auth/sign-up [post]
-func (h Handler) signUp(c *gin.Context) {
+func (h *Handler) signUp(c *gin.Context) {
 	var input domain.SignUpInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	id, err := h.services.Auth.CreateUser(input)
+	id, err := h.services.Auth.SignUp(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+		"id":     id,
 		"status": "User created",
 	})
 }
@@ -42,16 +43,38 @@ func (h Handler) signUp(c *gin.Context) {
 // @Success 200 {integer} string
 // @Failure default {object} errorResponse
 // @Router /auth/sign-in [post]
-func (h Handler) signIn(c *gin.Context) {
+func (h *Handler) signIn(c *gin.Context) {
 	var input domain.SignInInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	token, err := h.services.Auth.GenerateToken(input)
+	asseccToken, refreshToken, err := h.services.Auth.SignIn(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, token)
+	c.Header("Set-Cookie", fmt.Sprintf("refresh-token=%s; HttpOnly", refreshToken))
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"assecc-token":  asseccToken,
+		"refresh-token": refreshToken,
+	})
+}
+
+func (h *Handler) refresh(c *gin.Context) {
+	cookie, err := c.Cookie("refresh-token")
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	accessToken, refreshToken, err := h.services.Auth.RefreshTokens(cookie)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.Header("Set-Cookie", fmt.Sprintf("refresh-token=%s; HttpOnly", refreshToken))
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"assecc-token":  accessToken,
+		"refresh-token": refreshToken,
+	})
 }

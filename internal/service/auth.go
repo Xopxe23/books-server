@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 
@@ -26,24 +27,55 @@ func NewAuthService(repo repository.UsersRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(input domain.SignUpInput) (int, error) {
+func (s *AuthService) SignUp(input domain.SignUpInput) (int, error) {
 	input.Password = generatePasswordHash(input.Password)
 	return s.repo.CreateUser(input)
 }
 
-func (s *AuthService) GenerateToken(input domain.SignInInput) (string, error) {
+func (s *AuthService) SignIn(input domain.SignInInput) (string, string, error) {
 	input.Password = generatePasswordHash(input.Password)
 	user, err := s.repo.GetUser(input)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
+	return s.generateTokens(user.ID)
+}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":   strconv.Itoa(int(user.ID)),
-		"iat":  time.Now().Unix(),
+func (s *AuthService) generateTokens(id int64) (string, string, error) {
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": strconv.Itoa(int(id)),
+		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(tokenTTL).Unix(),
 	})
-	return token.SignedString([]byte(signingKey))
+	assessToken, err := t.SignedString([]byte(signingKey))
+	if err != nil {
+		return "", "", err
+	}
+	refreshToken, err := newRefreshToken()
+	if err != nil {
+		return "", "", err
+	}
+
+	if err := s.repo.CreateToken(domain.RefreshSession{
+		UserID:    id,
+		Token:     refreshToken,
+		ExpiresAt: time.Now().Add(time.Hour * 24 * 30),
+	}); err != nil {
+		return "", "", err
+	}
+
+	return assessToken, refreshToken, nil
+}
+
+func newRefreshToken() (string, error) {
+	b := make([]byte, 32)
+	s := rand.NewSource(time.Now().Unix())
+	r := rand.New(s)
+
+	if _, err := r.Read(b); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%x", b), nil
 }
 
 func (s *AuthService) ParseToken(token string) (int64, error) {
@@ -79,4 +111,15 @@ func generatePasswordHash(password string) string {
 	hash.Write([]byte(password))
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(solt)))
+}
+
+func (s *AuthService) RefreshTokens(refreshToken string) (string, string, error) {
+	session, err := s.repo.GetToken(refreshToken)
+	if err != nil {
+		return "", "", err
+	}
+	if session.ExpiresAt.Unix() < time.Now().Unix() {
+		return "", "", errors.New("refresh token expired")
+	}
+	return s.generateTokens(session.UserID)
 }
